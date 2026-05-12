@@ -1,0 +1,5 @@
+pymongo
+cryptography
+bcrypt
+pyperclip
+customtkinter
