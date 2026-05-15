@@ -8,7 +8,7 @@ def main():
     login_window = LoginWindow()
     
     # This function will be called after successful login
-    def on_successful_login(master_password: str):
+    def on_successful_login(username: str ,master_password: str):
         print(" Login Successful! Opening Main Application...")
         
         # Close login window and open main application
