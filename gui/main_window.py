@@ -57,6 +57,17 @@ class MainWindow:
         label = ctk.CTkLabel(self.main_content, text="All Passwords", font=ctk.CTkFont(size=18, weight="bold"))
         label.pack(pady=10)
         
+        # Search Bar
+        search_frame = ctk.CTkFrame(self.main_content)
+        search_frame.pack(fill="x", pady=10, padx=10)
+
+        ctk.CTkLabel(search_frame, text="Search:").pack(side="left", padx=5)
+        self.search_entry = ctk.CTkEntry(search_frame, placeholder_text="Search by site or username", width=400)
+        self.search_entry.pack(side="left", padx=5, fill="x", expand=True)
+        self.search_entry.bind("<KeyRelease>", lambda e: self.refresh_password_list())
+
+
+        
         # Treeview will be added in next step
         self.tree = ttk.Treeview(self.main_content, columns=("site", "username", "category"), show="headings")
         self.tree.heading("site", text="Website / App")
