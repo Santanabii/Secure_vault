@@ -36,7 +36,7 @@ class MainWindow:
 
         ctk.CTkButton(sidebar, text="All Passwords", height=45, 
                      command=self.show_passwords).pack(pady=8, padx=20, fill="x")
-        ctk.CTkButton(sidebar, text="Add New", height=45,
+        ctk.CTkButton(sidebar, text="Add New", height=45, fg_color="green", 
                      command=self.add_new_password).pack(pady=8, padx=20, fill="x")
         ctk.CTkButton(sidebar, text="Password Generator", height=45, 
                      command=self.show_generator).pack(pady=8, padx=20, fill="x")
