@@ -1,5 +1,5 @@
-pymongo
-cryptography
-bcrypt
-pyperclip
-customtkinter
+pymongo #is the MongoDB driver that connects my code to the MongoDB database.
+cryptography  #encrypting and decrypting passwords before storing them in the database.
+bcrypt #for hashing passwords
+pyperclip #for copying passwords to clipboard
+customtkinter #for the GUI
