@@ -38,24 +38,43 @@ A secure and modern desktop password manager built with Python for the end-of-mo
 8. Clean modern UI using CustomTkinter
 9. MongoDB Atlas cloud database
 
+## Running the Project Locally
 
-## Installation & Setup
-1. Create Virtual Environment
-```bash
- python -m venv my-env
-2. Activate Virtual Environment
-Windows (Command Prompt):
-```bash
-my-env\Scripts\activate
+Follow these steps to set up and run the project on your local machine.
 
-3. Install Dependencies
-```bash
-pip install -r requirements.txt
-4. Configure MongoDB
+
+### Prerequisites
+
+Make sure you have the following installed:
+
+- pymongo #is the MongoDB driver that connects my code to the MongoDB database.
+- cryptography  #encrypting and decrypting passwords before storing them in the database.
+- bcrypt #for hashing passwords
+- pyperclip #for copying passwords to clipboard
+- customtkinter #for the GUI
+- tkinter #for the GUI
+
+
+### 1. Create the virtual environment
+    python -m venv my-env
+
+
+### 2. Activate the virtualenvironment
+
+    my-env\Scripts\activate
+
+### 3. Install dependencies
+
+    pip install -r requirements.txt
+
+### 4. Configure database in this case MongoDB
+
 Update your MONGO_URI in config.py with your Atlas connection string.
-5. Run the Application
-```bash
-python main.py
+
+### 5. Run the Development Server
+
+    python main.py
+
 
 ## How to Use
 
