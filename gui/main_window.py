@@ -38,11 +38,37 @@ class MainWindow:
         ctk.CTkButton(sidebar, text="Add New", height=50, command=self.add_new_password).pack(pady=8, padx=20, fill="x")
         ctk.CTkButton(sidebar, text="Password Generator", height=50, command=self.show_generator).pack(pady=8, padx=20, fill="x")
         ctk.CTkButton(sidebar, text="Dashboard", height=50, command=self.show_dashboard).pack(pady=8, padx=20, fill="x")
+          
+        sidebar.pack_forget()  
+        sidebar.pack(side="left", fill="y")
+
+       
+        logout_btn = ctk.CTkButton(sidebar, text="Logout", height=45,
+                                  command=self.logout)
+        logout_btn.pack(side="bottom", pady=20, padx=20, fill="x") 
 
         self.main_content = ctk.CTkFrame(self.root)
         self.main_content.pack(side="right", fill="both", expand=True, padx=10, pady=10)
 
         self.show_passwords()
+
+    def logout(self):
+        """Logout and return to login screen"""
+        if messagebox.askyesno("Logout", "Are you sure you want to logout?"):
+            self.root.destroy()
+            self.restart_login()
+
+    def restart_login(self):
+        """Restart the login window"""
+        from gui.login_window import LoginWindow
+        login_window = LoginWindow()
+        
+        def on_successful_login(username: str, master_password: str):
+            app = MainWindow(username=username, master_password=master_password)
+            app.run()
+        
+        login_window.on_login_success = on_successful_login
+        login_window.run()
 
     def show_passwords(self):
         for widget in self.main_content.winfo_children():
