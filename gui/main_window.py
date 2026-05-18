@@ -159,13 +159,77 @@ class MainWindow:
         AddEditWindow(self.root, self.encryption, self.db, self.refresh_password_list, self.username)
 
     def show_generator(self):
-        # Same improved generator as before
         gen_win = ctk.CTkToplevel(self.root)
         gen_win.title("Password Generator")
-        gen_win.geometry("500x450")
-        gen_win.grab_set()
-        # ... (add the generator code from previous message if needed)
-        messagebox.showinfo("Generator", "Password Generator ready (add code if needed)")
+        gen_win.geometry("520x500")
+        gen_win.grab_set()   # Make it modal
+
+        ctk.CTkLabel(gen_win, text="Strong Password Generator", 
+                    font=ctk.CTkFont(size=20, weight="bold")).pack(pady=20)
+
+        # Length Input
+        ctk.CTkLabel(gen_win, text="Password Length", font=ctk.CTkFont(size=14)).pack(pady=(10,5))
+        self.length_var = ctk.CTkEntry(gen_win, width=180, placeholder_text="16")
+        self.length_var.pack(pady=5)
+        self.length_var.insert(0, "16")
+
+        # Options
+        self.include_upper = ctk.CTkCheckBox(gen_win, text="Include Uppercase (A-Z)")
+        self.include_upper.select()
+        self.include_upper.pack(pady=8, anchor="w", padx=80)
+
+        self.include_numbers = ctk.CTkCheckBox(gen_win, text="Include Numbers (0-9)")
+        self.include_numbers.select()
+        self.include_numbers.pack(pady=8, anchor="w", padx=80)
+
+        self.include_symbols = ctk.CTkCheckBox(gen_win, text="Include Symbols (@$!%*&^)")
+        self.include_symbols.select()
+        self.include_symbols.pack(pady=8, anchor="w", padx=80)
+
+        # Result
+        ctk.CTkLabel(gen_win, text="Generated Password", font=ctk.CTkFont(size=14)).pack(pady=(20,5))
+        self.result_entry = ctk.CTkEntry(gen_win, width=420, font=ctk.CTkFont(size=15))
+        self.result_entry.pack(pady=10)
+
+        # Buttons
+        btn_frame = ctk.CTkFrame(gen_win)
+        btn_frame.pack(pady=20)
+
+        ctk.CTkButton(btn_frame, text="Generate", width=150, 
+                     command=self.generate_password).pack(side="left", padx=10)
+        ctk.CTkButton(btn_frame, text="Copy", width=150, 
+                     command=self.copy_generated_password).pack(side="left", padx=10)
+
+    def generate_password(self):
+        """Generate strong password"""
+        try:
+            length = int(self.length_var.get())
+            if length < 6 or length > 64:
+                length = 16
+        except:
+            length = 16
+
+        characters = string.ascii_lowercase
+        if self.include_upper.get():
+            characters += string.ascii_uppercase
+        if self.include_numbers.get():
+            characters += string.digits
+        if self.include_symbols.get():
+            characters += "@$!%*#?&^_+-="
+
+        password = ''.join(random.choice(characters) for _ in range(length))
+
+        self.result_entry.delete(0, "end")
+        self.result_entry.insert(0, password)
+
+    def copy_generated_password(self):
+        """Copy generated password to clipboard"""
+        password = self.result_entry.get().strip()
+        if password:
+            pyperclip.copy(password)
+            messagebox.showinfo("Success", "Password copied to clipboard!")
+        else:
+            messagebox.showwarning("Empty", "Generate a password first")
 
     def show_dashboard(self):
         total = len(self.db.get_all_passwords(self.username))

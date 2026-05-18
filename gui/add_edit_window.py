@@ -1,6 +1,7 @@
 # gui/add_edit_window.py
 import customtkinter as ctk
 from tkinter import messagebox
+import re
 from datetime import datetime
 
 class AddEditWindow:
@@ -13,9 +14,8 @@ class AddEditWindow:
 
         self.window = ctk.CTkToplevel(parent)
         self.window.title("Edit Password" if entry_to_edit else "Add New Password")
-        self.window.geometry("550x750")
+        self.window.geometry("560x780")
         self.window.grab_set()
-        self.window.resizable(False, False)
 
         self.setup_ui()
 
@@ -25,27 +25,32 @@ class AddEditWindow:
 
         # Site
         ctk.CTkLabel(self.window, text="Website / App Name *").pack(anchor="w", padx=50, pady=(10,2))
-        self.site_entry = ctk.CTkEntry(self.window, width=440, height=40)
+        self.site_entry = ctk.CTkEntry(self.window, width=450, height=40)
         self.site_entry.pack(pady=5, padx=50)
 
         # Username
         ctk.CTkLabel(self.window, text="Username / Email *").pack(anchor="w", padx=50, pady=(10,2))
-        self.username_entry = ctk.CTkEntry(self.window, width=440, height=40)
+        self.username_entry = ctk.CTkEntry(self.window, width=450, height=40)
         self.username_entry.pack(pady=5, padx=50)
 
         # URL
         ctk.CTkLabel(self.window, text="URL / Link (Optional)").pack(anchor="w", padx=50, pady=(10,2))
-        self.url_entry = ctk.CTkEntry(self.window, width=440, height=40, placeholder_text="https://example.com")
+        self.url_entry = ctk.CTkEntry(self.window, width=450, height=40, placeholder_text="https://example.com")
         self.url_entry.pack(pady=5, padx=50)
 
-        # Password
-        ctk.CTkLabel(self.window, text="Password *").pack(anchor="w", padx=50, pady=(10,2))
-        self.password_entry = ctk.CTkEntry(self.window, width=440, height=40, show="*")
+        # Password with Strength
+        ctk.CTkLabel(self.window, text="Password *").pack(anchor="w", padx=50, pady=(15,2))
+        self.password_entry = ctk.CTkEntry(self.window, width=450, height=40, show="*")
         self.password_entry.pack(pady=5, padx=50)
+        self.password_entry.bind("<KeyRelease>", self.check_password_strength)
+
+        # Strength Indicator
+        self.strength_label = ctk.CTkLabel(self.window, text="Password Strength: -", font=ctk.CTkFont(size=14))
+        self.strength_label.pack(pady=5)
 
         # Category
         ctk.CTkLabel(self.window, text="Category").pack(anchor="w", padx=50, pady=(10,2))
-        self.category_entry = ctk.CTkEntry(self.window, width=440, height=40, placeholder_text="Social, Banking, Work...")
+        self.category_entry = ctk.CTkEntry(self.window, width=450, height=40, placeholder_text="Social, Banking, Work...")
         self.category_entry.pack(pady=5, padx=50)
 
         # Save Button
@@ -55,6 +60,56 @@ class AddEditWindow:
 
         if self.entry_to_edit:
             self.pre_fill_data()
+
+    def check_password_strength(self, event=None):
+        """Real-time password strength checker"""
+        password = self.password_entry.get()
+
+        if len(password) == 0:
+            self.strength_label.configure(text="Password Strength: -", text_color="gray")
+            return
+
+        score = 0
+        feedback = []
+
+        if len(password) >= 8:
+            score += 1
+        else:
+            feedback.append("At least 8 characters")
+
+        if re.search(r"[A-Z]", password):
+            score += 1
+        else:
+            feedback.append("Uppercase letter")
+
+        if re.search(r"[a-z]", password):
+            score += 1
+
+        if re.search(r"[0-9]", password):
+            score += 1
+        else:
+            feedback.append("Number")
+
+        if re.search(r"[@$!%*#?&^_+=]", password):
+            score += 1
+        else:
+            feedback.append("Symbol")
+
+        # Set color and text
+        if score >= 5:
+            strength = "Strong"
+            color = "green"
+        elif score >= 3:
+            strength = "Medium"
+            color = "orange"
+        else:
+            strength = "Weak"
+            color = "red"
+
+        self.strength_label.configure(
+            text=f"Password Strength: {strength}",
+            text_color=color
+        )
 
     def pre_fill_data(self):
         self.site_entry.insert(0, self.entry_to_edit.get("site", ""))
@@ -73,6 +128,11 @@ class AddEditWindow:
             messagebox.showerror("Error", "Site, Username and Password are required!")
             return
 
+        # Final strength check
+        if len(password) < 8 or not re.search(r"[A-Z]", password) or not re.search(r"[0-9]", password):
+            messagebox.showwarning("Weak Password", "Password is too weak!\nUse uppercase, numbers and symbols.")
+            return
+
         try:
             encrypted_pass = self.encryption.encrypt(password)
 
@@ -85,7 +145,7 @@ class AddEditWindow:
             }
 
             if self.entry_to_edit:
-                success = self.db.update_password(self.entry_to_edit["_id"], data, self.username)
+                self.db.update_password(self.entry_to_edit["_id"], data, self.username)
                 messagebox.showinfo("Success", "Password updated successfully!")
             else:
                 self.db.insert_password(data, self.username)
@@ -95,4 +155,4 @@ class AddEditWindow:
             self.window.destroy()
 
         except Exception as e:
-            messagebox.showerror("Error", f"Failed to save:\n{str(e)}")
+            messagebox.showerror("Error", f"Failed to save password:\n{str(e)}")
