@@ -20,7 +20,7 @@ def main():
     login_window = LoginWindow()
     
     def on_successful_login(username: str, master_password: str):
-        print(f"✅ Login Successful! Welcome, {username}")
+        print(f"Login Successful! Welcome, {username}")
         try:
             app = MainWindow(master_password)
             app.run()
