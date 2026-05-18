@@ -15,7 +15,7 @@ class AddEditWindow:
         self.window.title("Edit Password" if entry_to_edit else "Add New Password")
         self.window.geometry("540x720")
         self.window.grab_set()
-        self.window.resizable(False, False)
+        self.window.resizable(True, True)
 
         self.setup_ui()
 
@@ -48,10 +48,6 @@ class AddEditWindow:
         self.category_entry = ctk.CTkEntry(self.window, width=440, height=40, placeholder_text="Social, Banking, etc.")
         self.category_entry.pack(pady=5, padx=50)
 
-        # Notes
-        ctk.CTkLabel(self.window, text="Notes (Optional)").pack(anchor="w", padx=50, pady=(15,2))
-        self.notes_entry = ctk.CTkTextbox(self.window, width=440, height=80)
-        self.notes_entry.pack(pady=5, padx=50)
 
         # Save Button
         btn_text = "Update Password" if self.entry_to_edit else "Save Password"

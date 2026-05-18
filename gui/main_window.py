@@ -37,7 +37,7 @@ class MainWindow:
 
         ctk.CTkButton(sidebar, text="All Passwords", height=50, 
                      command=self.show_passwords).pack(pady=8, padx=20, fill="x")
-        ctk.CTkButton(sidebar, text="Add New", height=50, fg_color="green", 
+        ctk.CTkButton(sidebar, text="Add New", height=50,
                      command=self.add_new_password).pack(pady=8, padx=20, fill="x")
         ctk.CTkButton(sidebar, text="Password Generator", height=50, 
                      command=self.show_generator).pack(pady=8, padx=20, fill="x")
@@ -83,11 +83,11 @@ class MainWindow:
         btn_frame.pack(pady=15, padx=15, fill="x")
 
         buttons = [
-            ("Show Password", self.show_password, "#1f8a1f"),
-            ("Edit", self.edit_password, "orange"),
+            ("Show Password", self.show_password, None),
+            ("Edit", self.edit_password, None),
             ("Copy Username", self.copy_username, None),
             ("Copy Password", self.copy_password, None),
-            ("Delete", self.delete_password, "red")
+            ("Delete", self.delete_password, None)
         ]
 
         for text, cmd, color in buttons:
@@ -126,14 +126,34 @@ class MainWindow:
             return
 
         short_id = self.tree.item(selected[0])['values'][0]
-        for entry in self.db.get_all_passwords():
-            if str(entry["_id"])[-8:] == short_id:
-                try:
-                    decrypted = self.encryption.decrypt(entry["password"])
-                    messagebox.showinfo("Password", f"Site: {entry.get('site')}\n\nPassword:\n{decrypted}")
-                except:
-                    messagebox.showerror("Error", "Failed to decrypt password")
-                return
+
+        try:
+            for entry in self.db.get_all_passwords():
+                if str(entry["_id"])[-8:] == short_id:
+                    encrypted_pass = entry.get("password")
+                    
+                    if not encrypted_pass:
+                        messagebox.showerror("Error", "No password data found")
+                        return
+
+                    # Try to decrypt
+                    decrypted = self.encryption.decrypt(encrypted_pass)
+                    
+                    messagebox.showinfo(
+                        title="Decrypted Password",
+                        message=f"Site: {entry.get('site', 'N/A')}\n"
+                                f"Username: {entry.get('username', 'N/A')}\n\n"
+                                f"Password:\n{decrypted}"
+                    )
+                    return
+
+            messagebox.showerror("Not Found", "Password entry not found")
+
+        except Exception as e:
+            print(f"Decryption Error: {e}")  # For debugging
+            messagebox.showerror("Decryption Failed", 
+                "Could not decrypt password.\n\n"
+               )
 
     def copy_password(self):
         selected = self.tree.selection()
