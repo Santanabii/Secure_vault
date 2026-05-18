@@ -3,3 +3,4 @@ cryptography  #encrypting and decrypting passwords before storing them in the da
 bcrypt #for hashing passwords
 pyperclip #for copying passwords to clipboard
 customtkinter #for the GUI
+tkinter #for the GUI

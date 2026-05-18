@@ -18,8 +18,8 @@ class MainWindow:
         
         self.root = ctk.CTk()
         self.root.title("SecureVault - Password Manager")
-        self.root.geometry("1320x760")
-        self.root.minsize(1200, 680)
+        self.root.geometry("1350x780")
+        self.root.minsize(1250, 700)
         
         self.setup_ui()
         self.refresh_password_list()
@@ -28,7 +28,7 @@ class MainWindow:
         ctk.set_appearance_mode("dark")
         ctk.set_default_color_theme("blue")
 
-        # ==================== Sidebar ====================
+        # Sidebar
         sidebar = ctk.CTkFrame(self.root, width=260, corner_radius=0)
         sidebar.pack(side="left", fill="y")
         sidebar.pack_propagate(False)
@@ -44,14 +44,14 @@ class MainWindow:
         ctk.CTkButton(sidebar, text="Dashboard", height=50, 
                      command=self.show_dashboard).pack(pady=8, padx=20, fill="x")
 
-        # ==================== Main Content ====================
+        # Main Content
         self.main_content = ctk.CTkFrame(self.root)
         self.main_content.pack(side="right", fill="both", expand=True, padx=10, pady=10)
 
         self.show_passwords()
 
     def show_passwords(self):
-        """Main Passwords View"""
+        """Main view with all passwords"""
         for widget in self.main_content.winfo_children():
             widget.destroy()
 
@@ -118,7 +118,7 @@ class MainWindow:
                     url = "https://" + url
                 webbrowser.open(url)
 
-    # ====================== CORE FEATURES ======================
+    # ====================== PASSWORD OPERATIONS ======================
     def show_password(self):
         selected = self.tree.selection()
         if not selected:
@@ -130,7 +130,7 @@ class MainWindow:
             if str(entry["_id"])[-8:] == short_id:
                 try:
                     decrypted = self.encryption.decrypt(entry["password"])
-                    messagebox.showinfo("Password", f"Site: {entry['site']}\n\nPassword: {decrypted}")
+                    messagebox.showinfo("Password", f"Site: {entry.get('site')}\n\nPassword:\n{decrypted}")
                 except:
                     messagebox.showerror("Error", "Failed to decrypt password")
                 return
@@ -151,6 +151,13 @@ class MainWindow:
                 except:
                     messagebox.showerror("Error", "Failed to decrypt password")
                 return
+
+    def copy_username(self):
+        selected = self.tree.selection()
+        if selected:
+            username = self.tree.item(selected[0])['values'][2]
+            pyperclip.copy(username)
+            messagebox.showinfo("Copied", "Username copied to clipboard!")
 
     def edit_password(self):
         selected = self.tree.selection()
@@ -179,13 +186,6 @@ class MainWindow:
                         self.refresh_password_list()
                         return
 
-    def copy_username(self):
-        selected = self.tree.selection()
-        if selected:
-            username = self.tree.item(selected[0])['values'][2]
-            pyperclip.copy(username)
-            messagebox.showinfo("Copied", "Username copied to clipboard!")
-
     def add_new_password(self):
         AddEditWindow(self.root, self.encryption, self.db, self.refresh_password_list)
 
@@ -193,50 +193,56 @@ class MainWindow:
     def show_generator(self):
         gen_win = ctk.CTkToplevel(self.root)
         gen_win.title("Password Generator")
-        gen_win.geometry("500x450")
+        gen_win.geometry("520x480")
         gen_win.grab_set()
 
-        ctk.CTkLabel(gen_win, text="Strong Password Generator", font=ctk.CTkFont(size=20, weight="bold")).pack(pady=20)
+        ctk.CTkLabel(gen_win, text="Strong Password Generator", 
+                    font=ctk.CTkFont(size=20, weight="bold")).pack(pady=20)
 
         ctk.CTkLabel(gen_win, text="Password Length").pack(pady=(10,5))
         self.length_entry = ctk.CTkEntry(gen_win, width=150)
         self.length_entry.pack(pady=5)
         self.length_entry.insert(0, "16")
 
-        self.include_symbols = ctk.CTkCheckBox(gen_win, text="Include Symbols (@$!%*&)")
+        self.include_symbols = ctk.CTkCheckBox(gen_win, text="Include Symbols (@$!%*&^)")
         self.include_symbols.select()
         self.include_symbols.pack(pady=8)
 
-        self.result_entry = ctk.CTkEntry(gen_win, width=400, font=ctk.CTkFont(size=14))
+        self.result_entry = ctk.CTkEntry(gen_win, width=420, font=ctk.CTkFont(size=14))
         self.result_entry.pack(pady=20)
 
         ctk.CTkButton(gen_win, text="Generate", command=self.generate_password).pack(pady=5)
-        ctk.CTkButton(gen_win, text="Copy", command=self.copy_generated).pack(pady=5)
+        ctk.CTkButton(gen_win, text="Copy Password", command=self.copy_generated_password).pack(pady=5)
 
     def generate_password(self):
         try:
             length = int(self.length_entry.get())
+            if length < 6 or length > 64:
+                length = 16
         except:
             length = 16
+
         chars = string.ascii_letters + string.digits
         if self.include_symbols.get():
             chars += "@$!%*#?&^_+-="
-        pwd = ''.join(random.choice(chars) for _ in range(length))
-        self.result_entry.delete(0, "end")
-        self.result_entry.insert(0, pwd)
 
-    def copy_generated(self):
+        password = ''.join(random.choice(chars) for _ in range(length))
+        self.result_entry.delete(0, "end")
+        self.result_entry.insert(0, password)
+
+    def copy_generated_password(self):
         pwd = self.result_entry.get()
         if pwd:
             pyperclip.copy(pwd)
-            messagebox.showinfo("Copied", "Password copied!")
+            messagebox.showinfo("Copied", "Password copied to clipboard!")
 
     def show_dashboard(self):
         total = len(self.db.get_all_passwords())
         dash = ctk.CTkToplevel(self.root)
         dash.title("Dashboard")
         dash.geometry("600x500")
-        ctk.CTkLabel(dash, text=f"Total Passwords: {total}", font=ctk.CTkFont(size=22, weight="bold")).pack(pady=40)
+        ctk.CTkLabel(dash, text=f"Total Passwords: {total}", 
+                    font=ctk.CTkFont(size=24, weight="bold")).pack(pady=40)
 
     def run(self):
         self.root.mainloop()
