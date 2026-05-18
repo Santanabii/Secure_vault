@@ -26,63 +26,50 @@ A secure and modern desktop password manager built with Python for the end-of-mo
 - **Bcrypt** - Master Password Hashing
 - **Pyperclip** - Copy to clipboard
 
-## Project Structure
+ 
+## Features
+1. Master Password with strong validation
+2. User account isolation (each user sees only their data)
+3. Encryption for all passwords
+4. Add, Edit, Delete, and View passwords
+5. Clickable URLs (double-click to open)
+6. Copy Username & Password
+7. Strong Password Generator with real-time strength indicator
+8. Clean modern UI using CustomTkinter
+9. MongoDB Atlas cloud database
 
+
+## Installation & Setup
+1. Create Virtual Environment
 ```bash
-SecureVault/
-├── main.py
-├── config.py
-├── requirements.txt
-├── master.key                 
-├── user_profile.txt
-├── database/
-│   └── db_handler.py
-├── security/
-│   ├── auth.py
-│   └── encryption.py
-├── gui/
-│   ├── login_window.py
-│   ├── main_window.py
-│   └── add_edit_window.py
-└── README.md
-
-Installation & Setup
-1. Clone or Download the Project
-2. Create Virtual Environment
-Bashpython -m venv my-env
-Activate Virtual Environment:
-
-Windows (Command Prompt):Bashmy-env\Scripts\activate
-Windows (Git Bash):Bashsource my-env/Scripts/activate
+ python -m venv my-env
+2. Activate Virtual Environment
+Windows (Command Prompt):
+```bash
+my-env\Scripts\activate
 
 3. Install Dependencies
-Bashpip install -r requirements.txt
-4. Update MongoDB Connection
-Open config.py and make sure your MONGO_URI is correct.
+```bash
+pip install -r requirements.txt
+4. Configure MongoDB
+Update your MONGO_URI in config.py with your Atlas connection string.
 5. Run the Application
-Bashpython main.py
-How to Use
-First Time Setup
+```bash
+python main.py
 
-Run the application
-Enter a Username
-Create a strong Master Password (minimum 8 characters with letters, numbers & symbols)
-Click "Create New Account"
-Restart and login with the same credentials
+## How to Use
 
-Main Features
+First Time: Enter username and create a strong master password → Click "Create New Account"
+Restart the app and login
+Use the sidebar to navigate
+Double-click any row to open the website
+Use "Show Password", "Edit", or "Delete" buttons
 
-Add New → Click the green button
-Show Password → Select entry and click "Show Password"
-Edit → Select entry and click "Edit"
-Delete → Select entry and click "Delete"
-Password Generator → Available in sidebar
-Open Website → Double-click on any row with URL
 
-Security Features
+## Security Features
 
-Master password is hashed using bcrypt
-All passwords are encrypted using AES (Fernet)
-Encryption key is derived from your Master Password
-Each user’s data is isolated
-No plain text passwords stored in database
+Master password hashed with bcrypt
+All passwords encrypted with AES (Fernet)
+Encryption key derived from master password
+Data isolated per user
+
